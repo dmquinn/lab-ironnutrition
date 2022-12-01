@@ -1,23 +1,46 @@
-import logo from './logo.svg';
 import './App.css';
+import foods from './foods.json';
+import { useState } from 'react';
+import 'antd/dist/reset.css';
+
+import { Card, Row, Col, Divider, Input, Button } from 'antd';
+import FoodBox from './components/FoodBox';
+import AddFoodForm from './components/AddFoodForm';
+import SearchBar from './components/SearchBar';
 
 function App() {
+  const [foodList, setFoodList] = useState(foods);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showForm, setShowForm] = useState(false);
+
+  const filteredFoodList = foodList.filter((item) => {
+    return item.name.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  const handleDelete = (name) => {
+    console.log('clicked');
+    const filteredFoodList = foodList.filter((food) => {
+      return food.name !== name;
+    });
+    setFoodList(filteredFoodList);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      <Button onClick={() => setShowForm(!showForm)}>Show Form</Button>
+      {showForm && (
+        <AddFoodForm foodList={foodList} setFoodList={setFoodList} />
+      )}
+      <Row>
+        {filteredFoodList.map((food, i) => {
+          return (
+            <Col key={i}>
+              <FoodBox food={food} handleDelete={handleDelete} />
+            </Col>
+          );
+        })}
+      </Row>
     </div>
   );
 }
